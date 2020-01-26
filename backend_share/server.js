@@ -117,13 +117,14 @@ app.put("/tasks/:id",checkAuth,(req,res,next)=>{
         task:req.body.task,
         date:new Date()
     })
+    console.log(updatedtask);
     Task.updateOne({_id:req.params.id},updatedtask)
         .then((result)=>{
             if (result.n > 0){
-                res.status(200).send("Update Successful");
+                res.status(200).json({"message":"Update Successful"});
             }
             else{
-                res.status(403).send("Something went wrong");
+                res.status(403).json({"message":"Something went wrong"});
             }
         })
         .catch((error)=>{
