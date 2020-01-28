@@ -2,7 +2,7 @@ const express= require('express')
 const mongoose=require('mongoose')
 const bodyParser=require('body-parser')
 
-//const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("./usermodel");
@@ -133,10 +133,10 @@ app.put("/tasks/:id",checkAuth,(req,res,next)=>{
 })
 
 app.post("/users/createuser",(req, res, next) => {
-    
+    bcrypt.hash(req.body.password, 10).then(hash => {
       const user = new User({
         email: req.body.email,
-        password: req.body.password});
+        password: hash});
       
       user
         .save()
@@ -153,6 +153,7 @@ app.post("/users/createuser",(req, res, next) => {
           });
         });
     });
+    })
   
   app.post("/users/login", (req, res, next) => {
     let fetchedUser;
@@ -164,7 +165,7 @@ app.post("/users/createuser",(req, res, next) => {
           });
         }
         fetchedUser = user;
-        return (req.body.password== user.password);
+        return bcrypt.compare(req.body.password, user.password);
       })
       .then(result => {
         if (!result) {
